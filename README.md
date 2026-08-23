@@ -1,5 +1,12 @@
 ## koreader-base [![CircleCI](https://circleci.com/gh/koreader/koreader-base.svg?style=svg)](https://circleci.com/gh/koreader/koreader-base)
 
+## Fork note
+
+This fork follows [m-tky/koreader-base](https://github.com/m-tky/koreader-base)
+for the tategumi build. Its current downstream commit advances the bundled
+CREngine revision to the PocketBook-tested vertical line-end punctuation fix;
+the behavior itself is implemented and documented in the `crengine` submodule.
+
 This is the base framework for creating document readers like KOReader,
 an e-ink device oriented reader application for various document formats.
 

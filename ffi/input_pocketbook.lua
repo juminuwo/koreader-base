@@ -437,12 +437,11 @@ local function waitForEventRaw(timeout)
         end
 
         local remain = expire - now()
-        if remain < 0 then
-            -- Timed out
-            return false, C.ETIME
-        end
-
-        local ms = math.max(math.min(remain / 1000, 1000), 20)
+        -- Always poll once, even when the timeout has already expired. This
+        -- gives queued input events (notably a touch release delayed by a slow
+        -- repaint) precedence over an expired gesture timer, as the generic
+        -- input backend does.
+        local ms = remain <= 0 and 0 or math.max(math.min(remain / 1000, 1000), 20)
         poll_fds[0].events = is_active and C.POLLIN or 0
         for i=0, poll_fds_count-1 do
             poll_fds[i].revents = 0
@@ -452,8 +451,9 @@ local function waitForEventRaw(timeout)
             return false, ffi.errno()
         end
 
-        --- @note: No poll timeout handling?
-        --         e.g., if res == 0 then return false, C.ETIME end
+        if res == 0 and remain <= 0 then
+            return false, C.ETIME
+        end
 
         -- Message from monitor. This sendss us both touch and key events, but not in a format
         -- thats particularly useful. Keys are nice as they have symbolic names already, but
